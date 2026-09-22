@@ -441,6 +441,18 @@ h2 {
   .hero-copy { position: relative; z-index: 1; }
 }
 
+/* Between a phone and the two-column layout the figure has room to be smaller
+   than the viewport rather than wider than it: at 132vw the arcs sweep up
+   behind the headline, which is busy rather than atmospheric. */
+@media (min-width: 600px) and (max-width: 899px) {
+  .hero-figure {
+    width: 90vw;
+    margin-left: -45vw;
+    bottom: -12%;
+    opacity: 0.42;
+  }
+}
+
 /* The smallest phones still in use are 568px tall. Tightening the hero's own
    padding there is what keeps the call to action on the first screen; the
    type scale is already fluid and does not need a second set of sizes. */
