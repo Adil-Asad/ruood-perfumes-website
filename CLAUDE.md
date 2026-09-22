@@ -10,6 +10,8 @@ no dependencies, no build step for the content.**
 
 Right now it is one page: a coming-soon landing page, plus a 404 in the same
 design. That is the whole site, and the page's own copy is honest about it.
+The page also points visitors to RUŌOD Lab at `/lab` — the house's other
+product, served by a separate site through the proxy described below.
 
 Three projects sit beside each other on this machine and must stay separate:
 
@@ -62,8 +64,10 @@ the project at `/` exactly as Netlify serves `dist/`.
 Two Netlify sites, and this repository is the one that owns the domain.
 
 ```
-ruood.com/            THIS repo — publish directory dist/
-ruood.com/lab   →     200 rewrite → ruoo.netlify.app/lab — a DIFFERENT repo
+ruood.com/            THIS repo — Netlify project "ruoodp", publish dist/
+                      GitHub: Adil-Asad/ruood-perfumes-website, branch main
+ruood.com/lab   →     200 rewrite → ruoo.netlify.app/lab
+                      Netlify project "ruoo" — a DIFFERENT repo
 ```
 
 - **`publish = "dist"`.** `tools/build.mjs` stages the deployable files there
@@ -71,18 +75,25 @@ ruood.com/lab   →     200 rewrite → ruoo.netlify.app/lab — a DIFFERENT rep
   served. Add a file the site needs and add it to the `DEPLOY` list.
 - **This site owns the apex.** Its `404.html` answers unknown paths for the
   whole domain and its `robots.txt` is the only one a crawler reads — the Lab
-  cannot publish its own, so the Lab's rules belong in this repository's file
-  when `/lab` goes live.
-- **The `/lab` proxy rules are in this repository's `netlify.toml`, commented
-  out.** Switching them on is a deliberate act; read the notes beside them
-  first. `200` is a rewrite, so the address bar stays on `ruood.com/lab`,
-  which is what every canonical URL in the Lab project already claims. A `301`
-  would push visitors onto the netlify.app host and split the SEO value off
-  those URLs.
+  cannot publish its own, so the Lab's `Sitemap:` line lives in this
+  repository's file.
+- **The `/lab` proxy is live**, as two forced `200` rules at the bottom of
+  `netlify.toml`: `/lab` → `https://ruoo.netlify.app/lab` and `/lab/*` →
+  `https://ruoo.netlify.app/lab/:splat`. The `/lab` prefix is kept in the
+  target, because the Lab origin serves its pages under `/lab`. `verify.mjs`
+  fails if either rule is missing, is not a forced 200, loses the prefix, or
+  sits behind a `/*` rule. `200` is a rewrite, so the address bar stays on
+  `ruood.com/lab`, which is what every canonical URL in the Lab project
+  already claims. A `301` would push visitors onto the netlify.app host and
+  split the SEO value off those URLs.
 - **Never add a redirect whose target differs from its source only by a
   trailing slash.** Netlify ignores the trailing slash when matching `from`,
   so such a rule matches its own target and loops. The Lab site has answered
   `ERR_TOO_MANY_REDIRECTS` from exactly that shape of rule.
+- **Link to the Lab as `/lab`**, never to the netlify.app origin, which is an
+  implementation detail. The local preview cannot serve `/lab` (it is another
+  site), so `verify.mjs` skips fetching `/lab` links and checks the proxy rules
+  instead.
 - **Do not add `/lab` content to this repository**, and do not test the proxy
   against the live Lab site without being asked to.
 

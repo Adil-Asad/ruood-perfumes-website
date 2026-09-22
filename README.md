@@ -72,8 +72,8 @@ js/script.js          reveal-on-scroll and the year; the only script
 assets/icons/         favicon, touch icon, manifest icons — see "Brand assets"
 assets/images/        the Open Graph card
 assets/fonts/         empty on purpose: the site uses device fonts only
-netlify.toml          publish directory, headers, and the future /lab proxy
-robots.txt            speaks for the whole domain, including /lab later
+netlify.toml          publish directory, headers, and the /lab proxy
+robots.txt            speaks for the whole domain, including /lab
 sitemap.xml           one page, because there is one page
 site.webmanifest      name, colours, icons
 tools/                never deployed
@@ -111,21 +111,46 @@ ruood.com/            → this repository
 ruood.com/lab   →  200 rewrite →  ruoo.netlify.app/lab   (the Lab's own site)
 ```
 
-The proxy rules live in **this** repository's `netlify.toml`, commented out
-and ready. Two things matter when switching them on:
+| | main site | RUŌOD Lab |
+| --- | --- | --- |
+| Netlify project | `ruoodp` | `ruoo` |
+| repository | this one | `D:\ruood-lab-website\` |
+| public URL | `https://ruood.com/` | `https://ruood.com/lab` |
+
+The proxy rules live in **this** repository's `netlify.toml` and are live:
+
+```toml
+[[redirects]]
+  from = "/lab"
+  to = "https://ruoo.netlify.app/lab"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/lab/*"
+  to = "https://ruoo.netlify.app/lab/:splat"
+  status = 200
+  force = true
+```
+
+The target keeps the `/lab` prefix, because the Lab origin serves its pages
+under `/lab`. Two things matter about these rules:
 
 1. **Status 200, never 301.** A 200 is a rewrite: the address bar stays on
    `ruood.com/lab`, which is what every canonical URL, `og:url`, sitemap entry
    and JSON-LD `@id` in the Lab project already claims. A 301 would push
    visitors onto the netlify.app host and split the SEO value away from those
    URLs.
-2. **Uncomment the Lab's `Sitemap:` line in `robots.txt` at the same time.**
+2. **The Lab's `Sitemap:` line is in this repository's `robots.txt`.**
    A robots.txt is only honoured at the root of a domain, so the Lab cannot
    publish its own — its rules belong in this repository's file. (The Lab
    keeps a `robots.txt` of its own purely as the source to merge in.)
 
-Until then, nothing in this repository touches the Lab, and there is no `/lab`
-content here.
+There is no `/lab` content in this repository. The front page links to the
+Lab as `/lab` (never the netlify.app address), in its own section and in the
+colophon. The local preview cannot serve `/lab`, because that is another
+site, so `verify` checks the proxy rules in `netlify.toml` instead of fetching
+the path.
 
 ---
 
@@ -163,7 +188,6 @@ other file needs to change.
 
 ## Git
 
-The repository is initialised with an initial commit on `main` and has **no
-remote**. It is ready to be pushed to a new, empty GitHub repository of its
-own — see the end of this file's history or run `git remote -v` to confirm
-nothing is configured. Do not push it to the RUŌOD Lab repository.
+The remote is `https://github.com/Adil-Asad/ruood-perfumes-website.git`, and
+`main` is the production branch Netlify builds. Do not push this repository to
+the RUŌOD Lab repository.

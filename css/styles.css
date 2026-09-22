@@ -569,6 +569,50 @@ html:not(.no-js) .arc-5 { animation-delay: 0.64s; }
 .signature .wordmark-o { color: var(--brass-soft); }
 
 /* --------------------------------------------------------------------------
+   RUŌOD Lab — the house's other product, served at /lab by its own site
+
+   A quiet ivory passage between the dark statement and the invitation. It is
+   meant to be found, not to compete with the hero, so it takes a shorter
+   section rhythm and an outlined button rather than the filled one.
+   -------------------------------------------------------------------------- */
+
+.lab {
+  padding-block: calc(var(--section-y) * 0.6);
+}
+.lab-inner {
+  display: grid;
+  gap: 24px;
+}
+.lab h2 { margin-top: 16px; }
+.lab h2 em {
+  font-style: italic;
+  color: var(--brass-warm);
+}
+.lab-lede {
+  font-family: var(--font-display);
+  font-size: clamp(1.02rem, 2vw, 1.18rem);
+  line-height: 1.62;
+  color: var(--muted);
+  max-width: 52ch;
+}
+.lab-body > * + * { margin-top: 28px; }
+.lab-arrow {
+  margin-left: 12px;
+  font-family: var(--font-body);
+  letter-spacing: 0;
+  transition: transform 0.4s var(--ease);
+}
+.lab-link:hover .lab-arrow { transform: translateX(4px); }
+
+@media (min-width: 900px) {
+  .lab-inner {
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+    gap: 72px;
+    align-items: start;
+  }
+}
+
+/* --------------------------------------------------------------------------
    Invitation
    -------------------------------------------------------------------------- */
 
@@ -629,6 +673,14 @@ html:not(.no-js) .arc-5 { animation-delay: 0.64s; }
   padding-inline: 2px;
 }
 .colophon-sep { color: var(--line-control); }
+
+/* Three items no longer fit one line on a phone, and a wrapped row leaves a
+   separator hanging at a line end. Below the colophon's own grid breakpoint
+   they stack instead, with no separators. */
+@media (max-width: 719px) {
+  .colophon-line { flex-direction: column; gap: 0; }
+  .colophon-sep { display: none; }
+}
 .colophon-legal {
   font-size: 12.5px;
   color: var(--muted);

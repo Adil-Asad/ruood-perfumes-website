@@ -9,8 +9,8 @@
 #
 # RUŌOD Lab is a SEPARATE project on a SEPARATE Netlify site, served from its
 # own origin (ruoo.netlify.app/lab). It is not part of this repository and it
-# is not deployed from here. When it is switched on, this site will proxy
-# /lab through to it — see "The /lab proxy" at the bottom of this file.
+# is not deployed from here. This site proxies /lab through to it — see
+# "The /lab proxy" at the bottom of this file.
 
 [build]
   command = "npm run build"
@@ -18,8 +18,9 @@
 
 # ── Routing ───────────────────────────────────────────────────────────────
 #
-# There is nothing to route. dist/index.html is the site root and Netlify
-# serves it at /, and dist/404.html answers anything unmatched automatically.
+# dist/index.html is the site root and Netlify serves it at /, and
+# dist/404.html answers anything unmatched automatically. The only rules are
+# the two /lab proxy rules at the bottom of this file.
 #
 # Do NOT add a redirect whose target differs from its source only by a
 # trailing slash: Netlify ignores the trailing slash when matching `from`, so
@@ -83,36 +84,45 @@
     Permissions-Policy = "geolocation=(), microphone=(), camera=(), payment=(), usb=(), interest-cohort=()"
     Strict-Transport-Security = "max-age=31536000"
 
-# ── The /lab proxy — NOT ACTIVE YET ───────────────────────────────────────
+# ── The /lab proxy ────────────────────────────────────────────────────────
 #
-# RUŌOD Lab is deployed on its own Netlify site and is reached publicly at
-# https://ruood.com/lab. That works by this site rewriting /lab and /lab/*
-# through to the Lab origin with status = 200. Uncomment the two rules below
-# to switch it on, and read the notes first:
+# RUŌOD Lab is deployed on its own Netlify site (project "ruoo") and is
+# reached publicly at https://ruood.com/lab. That works by this site
+# rewriting /lab and /lab/* through to the Lab origin with status = 200:
+#
+#   ruood.com/lab        →  ruoo.netlify.app/lab
+#   ruood.com/lab/about  →  ruoo.netlify.app/lab/about   (the /lab prefix is
+#                                                          kept, not stripped)
 #
 #   * 200 is a REWRITE, not a redirect: the address bar stays on
 #     ruood.com/lab, which is what every canonical URL, og:url, sitemap entry
 #     and JSON-LD @id in the Lab project already says. A 301 would push
 #     visitors onto the netlify.app host and split the SEO value away from
-#     those canonical URLs.
+#     those canonical URLs. Never change these to 301 or 302.
 #   * Both rules are needed. /lab alone does not match /lab/*.
 #   * force = true, so these win over anything this site might serve at the
-#     same path. Never add a page at /lab here.
-#   * The Lab origin sends its own security headers, which pass through the
-#     proxy. After switching this on, check that the [[headers]] block above
-#     does not collide with them on /lab/* — if it does, narrow this site's
-#     header rules to the paths it actually owns rather than loosening them.
-#   * Also add the Lab's Sitemap line to robots.txt (it is already there,
-#     commented, for the same reason).
-#
-# [[redirects]]
-#   from = "/lab"
-#   to = "https://ruoo.netlify.app/lab"
-#   status = 200
-#   force = true
-#
-# [[redirects]]
-#   from = "/lab/*"
-#   to = "https://ruoo.netlify.app/lab/:splat"
-#   status = 200
-#   force = true
+#     same path. Never add a page at /lab here. There is no catch-all rule in
+#     this file for them to compete with; if one is ever added, it must come
+#     AFTER these, because Netlify applies the first rule that matches.
+#   * The Lab origin handles its own trailing slash (/lab and /lab/ are both
+#     forced 200s there) and its own 404s, which pass back through with their
+#     status intact. That is why nothing here redirects /lab/ to /lab.
+#   * The Lab origin sends its own security headers, and they pass through the
+#     proxy. Its CSP is currently identical to this site's, so the [[headers]]
+#     block above does not conflict with it on /lab/*. If the Lab's policy
+#     ever diverges, narrow this site's header rules to the paths it actually
+#     owns rather than loosening them.
+#   * robots.txt carries the Lab's Sitemap line, because a crawler only reads
+#     the one at the root of the domain.
+
+[[redirects]]
+  from = "/lab"
+  to = "https://ruoo.netlify.app/lab"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/lab/*"
+  to = "https://ruoo.netlify.app/lab/:splat"
+  status = 200
+  force = true

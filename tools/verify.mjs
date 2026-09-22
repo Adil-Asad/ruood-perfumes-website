@@ -28,10 +28,16 @@
  *              can stand behind (ratings, reviews, prices, awards).
  *   a11y       lang, viewport, alt text, a labelled decorative figure, and a
  *              skip link that comes first.
+ *   /lab       links to /lab are served by the Lab's own Netlify site through
+ *              a 200 rewrite, so the preview cannot resolve them. Instead this
+ *              checks that netlify.toml carries both proxy rules, as 200s, to
+ *              the Lab origin with the /lab prefix kept.
  *
  * Exits non-zero on any failure. `npm run measure` checks different things
  * again — layout overflow and tap targets — and neither subsumes the other.
  */
+
+import { readFile } from 'node:fs/promises';
 
 const PORT = Number(process.argv[2]) || 8098;
 const BASE = `http://localhost:${PORT}`;
@@ -42,6 +48,10 @@ const PAGES = [
   { path: '/', name: 'front page', indexable: true },
   { path: '/404.html', name: '404', indexable: false },
 ];
+
+/** Paths another origin answers through the proxy in netlify.toml. */
+const LAB_ORIGIN = 'https://ruoo.netlify.app';
+const isProxied = (path) => path === '/lab' || path.startsWith('/lab/');
 
 const INLINE_SCRIPT = "document.documentElement.classList.remove('no-js');";
 const SCRIPT_HASH = 'sha256-tuKyZn/3ycw/MNMDii/kvSPrelo6SCsJSecqb1n2neg=';
@@ -216,6 +226,7 @@ for (const page of PAGES) {
       fail(where, `path is not root-relative: ${value}`);
       continue;
     }
+    if (isProxied(value)) continue;  // served through the proxy; checked below
     const target = await fetch(BASE + value, { method: 'GET' });
     if (!target.ok) fail(where, `broken path: ${value} (${target.status})`);
   }
@@ -249,6 +260,29 @@ for (const page of PAGES) {
 }
 
 /* ── site-level files ─────────────────────────────────────────────────── */
+
+/* --- the /lab proxy ---------------------------------------------------- */
+// A 301 or 302 here would put the netlify.app host in the address bar, and a
+// `to` without the /lab prefix would ask the Lab origin for paths it does not
+// serve. Both are silent until someone clicks through on the live site.
+const toml = await readFile(new URL('../netlify.toml', import.meta.url), 'utf8');
+const rules = toml.split(/^(?=\[\[)/m)
+  .filter((block) => block.startsWith('[[redirects]]'))
+  .map((block) => {
+    const field = (name) => (block.match(new RegExp(`^[ \\t]*${name}[ \\t]*=[ \\t]*"?([^"\\r\\n]*)"?`, 'm')) || [])[1];
+    return { from: field('from'), to: field('to'), status: field('status'), force: field('force') };
+  });
+for (const [from, to] of [['/lab', `${LAB_ORIGIN}/lab`], ['/lab/*', `${LAB_ORIGIN}/lab/:splat`]]) {
+  const rule = rules.find((r) => r.from === from);
+  if (!rule) { fail('netlify.toml', `no active redirect rule for ${from}`); continue; }
+  if (rule.to !== to) fail('netlify.toml', `${from} goes to ${rule.to}, expected ${to}`);
+  if (rule.status !== '200') fail('netlify.toml', `${from} has status ${rule.status}; it must be a 200 rewrite`);
+  if (rule.force !== 'true') fail('netlify.toml', `${from} is not forced`);
+}
+const labIndex = rules.findIndex((r) => r.from === '/lab');
+if (rules.slice(0, Math.max(labIndex, 0)).some((r) => r.from === '/*')) {
+  fail('netlify.toml', 'a /* rule comes before the /lab proxy and would win');
+}
 
 const robotsTxt = await get('/robots.txt');
 if (!robotsTxt.res.ok) fail('robots.txt', 'missing');

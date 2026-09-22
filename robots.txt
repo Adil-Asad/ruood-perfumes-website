@@ -12,13 +12,10 @@ Sitemap: https://ruood.com/sitemap.xml
 # ── RUŌOD Lab ─────────────────────────────────────────────────────────────
 #
 # The Lab is a separate project on a separate Netlify site, reached at
-# https://ruood.com/lab once this site proxies /lab through to it. Because
-# robots.txt is only honoured at the root of a domain, the Lab cannot publish
-# its own — its rules belong here. Its project keeps a robots.txt of its own
-# purely as the source to merge in.
-#
-# Uncomment this line at the same time as the /lab proxy rules in
-# netlify.toml. Until the proxy is live the URL would 404, and pointing a
-# crawler at a 404 sitemap is worse than pointing it at none.
-#
-# Sitemap: https://ruood.com/lab/sitemap.xml
+# https://ruood.com/lab because this site proxies /lab through to it (see
+# netlify.toml). Because robots.txt is only honoured at the root of a domain,
+# the Lab cannot publish its own — its rules belong here. Its project keeps a
+# robots.txt of its own purely as the source to merge in; the Allow above
+# already covers /lab, so the Sitemap line is all that needs carrying over.
+
+Sitemap: https://ruood.com/lab/sitemap.xml
