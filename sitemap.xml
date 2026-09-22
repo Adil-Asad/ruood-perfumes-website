@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  One page, because there is one page. 404.html is deliberately absent: it is
+  noindex and a sitemap is a list of pages worth indexing.
+
+  Update <lastmod> when the page's content changes, and add entries here as
+  the site grows. The Lab's pages are NOT listed here — they have their own
+  sitemap at /lab/sitemap.xml, which robots.txt will point to once /lab is
+  proxied.
+-->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://ruood.com/</loc>
+    <lastmod>2026-09-22</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+</urlset>

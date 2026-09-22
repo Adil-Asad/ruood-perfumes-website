@@ -1,0 +1,16 @@
+{
+  "name": "ruood-perfumes-website",
+  "version": "1.0.0",
+  "private": true,
+  "description": "The main RUOOD website, served at https://ruood.com/",
+  "type": "module",
+  "scripts": {
+    "preview": "node tools/preview.mjs 8080",
+    "build": "node tools/build.mjs",
+    "verify": "node tools/verify.mjs 8098",
+    "measure": "node tools/measure.mjs 8098",
+    "shots": "node tools/shots.mjs ./.shots 8098",
+    "icons": "node tools/make-icons.mjs"
+  },
+  "engines": { "node": ">=18" }
+}

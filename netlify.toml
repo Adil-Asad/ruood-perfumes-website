@@ -1,0 +1,118 @@
+# Netlify configuration for the RUŌOD website — https://ruood.com/
+#
+# ── What this site is ─────────────────────────────────────────────────────
+#
+# This is the MAIN site. It owns the apex, ruood.com, and it is the site the
+# apex DNS records point at. Its publish directory is dist/, which
+# `npm run build` stages from the repository root, so that the documentation,
+# the tools and package.json are never deployed.
+#
+# RUŌOD Lab is a SEPARATE project on a SEPARATE Netlify site, served from its
+# own origin (ruoo.netlify.app/lab). It is not part of this repository and it
+# is not deployed from here. When it is switched on, this site will proxy
+# /lab through to it — see "The /lab proxy" at the bottom of this file.
+
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+# ── Routing ───────────────────────────────────────────────────────────────
+#
+# There is nothing to route. dist/index.html is the site root and Netlify
+# serves it at /, and dist/404.html answers anything unmatched automatically.
+#
+# Do NOT add a redirect whose target differs from its source only by a
+# trailing slash: Netlify ignores the trailing slash when matching `from`, so
+# such a rule matches its own target and loops.
+
+# ── Caching ───────────────────────────────────────────────────────────────
+#
+# Filenames carry no content hash, so the HTML must revalidate on every visit
+# while the assets, which change only on a deploy, may be held for a day.
+
+[[headers]]
+  for = "/*.html"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+[[headers]]
+  for = "/css/*"
+  [headers.values]
+    Cache-Control = "public, max-age=86400"
+
+[[headers]]
+  for = "/js/*"
+  [headers.values]
+    Cache-Control = "public, max-age=86400"
+
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=86400"
+
+# ── Security headers ──────────────────────────────────────────────────────
+#
+# The site loads nothing from a third party — no fonts, no CDN, no analytics,
+# no embeds — so the policy can say exactly that, and `connect-src 'none'`
+# means the page cannot phone home either. If an external resource is ever
+# added, this policy has to change with it, and so does the sentence on the
+# front page that promises the page loads nothing from anywhere else.
+#
+# The script-src hash covers the ONE inline script each page carries:
+#   document.documentElement.classList.remove('no-js');
+# It is hashed rather than allowed with 'unsafe-inline', so no other inline
+# script can run. Change that line and the hash must be regenerated here and
+# in tools/preview.mjs, which keeps its own copy:
+#   node -e "const c=require('crypto');console.log('sha256-'+c.createHash('sha256').update(\"document.documentElement.classList.remove('no-js');\",'utf8').digest('base64'))"
+#
+# style-src has no 'unsafe-inline', which is why no element in this site ever
+# carries a style attribute: it would be dropped here while working fine in a
+# preview that sends no header. tools/preview.mjs sends this same policy so
+# the two cannot disagree.
+#
+# img-src allows data: for the one inline SVG grain texture in styles.css.
+# form-action is 'none' because there is no form on the site; the calls to
+# action are mailto links, which form-action does not govern.
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'sha256-tuKyZn/3ycw/MNMDii/kvSPrelo6SCsJSecqb1n2neg='; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'none'; frame-ancestors 'none'; base-uri 'self'; form-action 'none'"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "geolocation=(), microphone=(), camera=(), payment=(), usb=(), interest-cohort=()"
+    Strict-Transport-Security = "max-age=31536000"
+
+# ── The /lab proxy — NOT ACTIVE YET ───────────────────────────────────────
+#
+# RUŌOD Lab is deployed on its own Netlify site and is reached publicly at
+# https://ruood.com/lab. That works by this site rewriting /lab and /lab/*
+# through to the Lab origin with status = 200. Uncomment the two rules below
+# to switch it on, and read the notes first:
+#
+#   * 200 is a REWRITE, not a redirect: the address bar stays on
+#     ruood.com/lab, which is what every canonical URL, og:url, sitemap entry
+#     and JSON-LD @id in the Lab project already says. A 301 would push
+#     visitors onto the netlify.app host and split the SEO value away from
+#     those canonical URLs.
+#   * Both rules are needed. /lab alone does not match /lab/*.
+#   * force = true, so these win over anything this site might serve at the
+#     same path. Never add a page at /lab here.
+#   * The Lab origin sends its own security headers, which pass through the
+#     proxy. After switching this on, check that the [[headers]] block above
+#     does not collide with them on /lab/* — if it does, narrow this site's
+#     header rules to the paths it actually owns rather than loosening them.
+#   * Also add the Lab's Sitemap line to robots.txt (it is already there,
+#     commented, for the same reason).
+#
+# [[redirects]]
+#   from = "/lab"
+#   to = "https://ruoo.netlify.app/lab"
+#   status = 200
+#   force = true
+#
+# [[redirects]]
+#   from = "/lab/*"
+#   to = "https://ruoo.netlify.app/lab/:splat"
+#   status = 200
+#   force = true

@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="RUOOD">
+  <!--
+    A placeholder mark, drawn rather than typeset so it does not depend on a
+    font being present: the Ō of RUŌOD — a ring and its macron — in brass on
+    the house's ink. Replace this file (and re-run tools/make-icons.mjs) when
+    the official RUŌOD brand asset is available; nothing else references the
+    shapes directly.
+  -->
+  <rect width="64" height="64" fill="#14120F"/>
+  <rect x="21" y="14" width="22" height="3.6" rx="1.8" fill="#C9A86A"/>
+  <circle cx="32" cy="38" r="14.5" fill="none" stroke="#C9A86A" stroke-width="4.6"/>
+</svg>

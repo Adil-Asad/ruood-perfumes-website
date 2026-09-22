@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="RUOOD">
+  <!--
+    The same placeholder mark as favicon.svg, drawn at icon scale with the
+    safe-area padding an Android maskable icon and an Apple touch icon both
+    want (the artwork stays inside the middle 80%). tools/make-icons.mjs
+    rasterises this file into the PNG sizes the site links to.
+  -->
+  <rect width="512" height="512" fill="#14120F"/>
+  <rect x="176" y="148" width="160" height="26" rx="13" fill="#C9A86A"/>
+  <circle cx="256" cy="316" r="104" fill="none" stroke="#C9A86A" stroke-width="33"/>
+</svg>
