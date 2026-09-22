@@ -61,6 +61,7 @@
   --gutter: 22px;
   --max-w: 1220px;
   --max-prose: 62ch;
+  --max-column: 860px;   /* the reading column the sections after the hero share */
   --section-y: 88px;
 
   /* Motion */
@@ -543,7 +544,7 @@ html:not(.no-js) .arc-5 { animation-delay: 0.64s; }
 .statement-inner {
   position: relative;
   z-index: 1;
-  max-width: 860px;
+  max-width: var(--max-column);
 }
 .statement h2 {
   margin-top: 22px;
@@ -571,31 +572,30 @@ html:not(.no-js) .arc-5 { animation-delay: 0.64s; }
 /* --------------------------------------------------------------------------
    RUŌOD Lab — the house's other product, served at /lab by its own site
 
-   A quiet ivory passage between the dark statement and the invitation. It is
-   meant to be found, not to compete with the hero, so it takes a shorter
-   section rhythm and an outlined button rather than the filled one.
+   The statement's ivory counterpart: the same column, the same section rhythm
+   and the same eyebrow → heading → prose steps, so the page reads as one
+   sequence rather than a block dropped between two others. It stays quieter
+   than the hero by taking the outlined button rather than the filled one.
    -------------------------------------------------------------------------- */
 
 .lab {
-  padding-block: calc(var(--section-y) * 0.6);
+  padding-block: var(--section-y);
 }
-.lab-inner {
-  display: grid;
-  gap: 24px;
-}
-.lab h2 { margin-top: 16px; }
+.lab-inner { max-width: var(--max-column); }
+.lab h2 { margin-top: 22px; }
 .lab h2 em {
   font-style: italic;
   color: var(--brass-warm);
 }
 .lab-lede {
+  margin-top: 34px;
   font-family: var(--font-display);
   font-size: clamp(1.02rem, 2vw, 1.18rem);
   line-height: 1.62;
   color: var(--muted);
   max-width: 52ch;
 }
-.lab-body > * + * { margin-top: 28px; }
+.lab-action { margin-top: 32px; }
 .lab-arrow {
   margin-left: 12px;
   font-family: var(--font-body);
@@ -603,14 +603,6 @@ html:not(.no-js) .arc-5 { animation-delay: 0.64s; }
   transition: transform 0.4s var(--ease);
 }
 .lab-link:hover .lab-arrow { transform: translateX(4px); }
-
-@media (min-width: 900px) {
-  .lab-inner {
-    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
-    gap: 72px;
-    align-items: start;
-  }
-}
 
 /* --------------------------------------------------------------------------
    Invitation

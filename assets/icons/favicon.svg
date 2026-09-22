@@ -5,8 +5,13 @@
     the house's ink. Replace this file (and re-run tools/make-icons.mjs) when
     the official RUŌOD brand asset is available; nothing else references the
     shapes directly.
+
+    The ground's corners are softened (rx 10 of 64, about 16%) so the tab icon
+    does not read as a hard square; the corners outside it are transparent.
+    Only the favicon is rounded: ruood-mark.svg stays full-bleed, because the
+    touch and maskable icons are shaped by the platform's own mask.
   -->
-  <rect width="64" height="64" fill="#14120F"/>
+  <rect width="64" height="64" rx="10" fill="#14120F"/>
   <rect x="21" y="14" width="22" height="3.6" rx="1.8" fill="#C9A86A"/>
   <circle cx="32" cy="38" r="14.5" fill="none" stroke="#C9A86A" stroke-width="4.6"/>
 </svg>
